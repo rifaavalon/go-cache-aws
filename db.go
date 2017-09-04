@@ -32,9 +32,9 @@ func (a *AWS) init() {
 	input := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			&ec2.Filter{
-				Name: aws.String(""),
+				Name: aws.String("tag:env.name"),
 				Values: []*string{
-					aws.String(""),
+					aws.String("live"),
 				},
 			},
 		},
@@ -46,12 +46,12 @@ func (a *AWS) init() {
 	}
 	for _, reservations := range result.Reservations {
 		for _, instance := range reservations.Instances {
-			fmt.Println("instance:", *instance.InstanceId)
+			fmt.Println("instance:", *instance)
 			output, err1 := json.Marshal(*instance)
 			if err1 != nil {
 				fmt.Println(err1)
 			}
-			c.Do("SET", fmt.Sprintf("instance:%s", *instance.InstanceId), output)
+			c.Do("SET", fmt.Sprintf("instance:%s", *instance.InstanceId), output, *instance)
 		}
 	}
 }
