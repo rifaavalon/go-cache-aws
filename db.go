@@ -32,9 +32,9 @@ func (a *AWS) init() {
 	input := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			&ec2.Filter{
-				Name: aws.String("tag:env.name"),
+				Name: aws.String(""),
 				Values: []*string{
-					aws.String("live"),
+					aws.String(""),
 				},
 			},
 		},
