@@ -40,14 +40,14 @@ POST /instances: Create a new instance.
 
 ## Example Requests
 
-### Get All Instances
+#### Get All Instances
 `curl http://localhost:8080/instances`
-### Get a Specific Instance
+#### Get a Specific Instance
 `curl http://localhost:8080/instances/1`
-### Create a New Instance
+#### Create a New Instance
 `curl -X POST http://localhost:8080/instances -d '{"field1":"value1", "field2":"value2"}' -H "Content-Type: application/json"`
 
-## Project Structure
+### Project Structure
 
 ```
 .
