@@ -2,36 +2,36 @@ package main
 
 import "time"
 
-type Instance struct {
-	ID                    int64  `json:"id"`
-	OwnerID               string `json:"OwnerId"`
-	Instances             interface{}
-	InstanceId            interface{}
-	BlockDeviceMappings   interface{}
-	ReservationID         string `json:"ReservationId,omitempty"`
-	SecurityGroups        interface{}
-	NetworkInterfaces     interface{}
-	Attachment            interface{}
-	Groups                interface{}
-	Hypervisor            string `json:"Hypervisor,omitempty"`
-	RootDeviceName        string `json:"RootDeviceName,omitempty"`
-	IamInstanceProfile    interface{}
-	VirtualizationType    string `json:"VirtualizationType,omitempty"`
-	Tags                  interface{}
-	AmiLaunchIndex        int  `json:"AmiLaunchIndex,omitempty"`
-	EbsOptimized          bool `json:"EbsOptimized,omitempty"`
-	State                 interface{}
-	Platform              string `json:"Platform,omitempty"`
-	PublicDNSName         string `json:"PublicDnsName,omitempty"`
-	VpcID                 string `json:"VpcId,omitempty"`
-	StateTransitionReason string `json:"StateTransitionReason,omitempty"`
-	ImageID               string `json:"ImageId,omitempty"`
-	ClientToken           string `json:"ClientToken,omitempty"`
-	SubnetID              string `json:"SubnetId,omitempty"`
-	InstanceType          string `json:"InstanceType,omitempty"`
-	Placement             interface{}
-	LaunchTime            time.Time `json:"LaunchTime"`
+type EC2Instance struct {
+	ID                    int64     `json:"id"`
+	OwnerID               string    `json:"owner_id"`
+	Instances             []string  `json:"instances,omitempty"`
+	InstanceId            string    `json:"instance_id,omitempty"`
+	BlockDeviceMappings   []string  `json:"block_device_mappings,omitempty"`
+	ReservationID         string    `json:"reservation_id,omitempty"`
+	SecurityGroups        []string  `json:"security_groups,omitempty"`
+	NetworkInterfaces     []string  `json:"network_interfaces,omitempty"`
+	Attachment            string    `json:"attachment,omitempty"`
+	Groups                []string  `json:"groups,omitempty"`
+	Hypervisor            string    `json:"hypervisor,omitempty"`
+	RootDeviceName        string    `json:"root_device_name,omitempty"`
+	IamInstanceProfile    string    `json:"iam_instance_profile,omitempty"`
+	VirtualizationType    string    `json:"virtualization_type,omitempty"`
+	Tags                  []string  `json:"tags,omitempty"`
+	AmiLaunchIndex        int       `json:"ami_launch_index,omitempty"`
+	EbsOptimized          bool      `json:"ebs_optimized,omitempty"`
+	State                 string    `json:"state,omitempty"`
+	Platform              string    `json:"platform,omitempty"`
+	PublicDNSName         string    `json:"public_dns_name,omitempty"`
+	VpcID                 string    `json:"vpc_id,omitempty"`
+	StateTransitionReason string    `json:"state_transition_reason,omitempty"`
+	ImageID               string    `json:"image_id,omitempty"`
+	ClientToken           string    `json:"client_token,omitempty"`
+	SubnetID              string    `json:"subnet_id,omitempty"`
+	InstanceType          string    `json:"instance_type,omitempty"`
+	Placement             string    `json:"placement,omitempty"`
+	LaunchTime            time.Time `json:"launch_time"`
 	Timestamp             time.Time `json:"timestamp"`
 }
 
-type Instances []Instance
+type Instances []EC2Instance

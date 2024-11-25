@@ -1,37 +1,49 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"strconv"
+	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/garyburd/redigo/redis"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+const (
+	mongoURI          = "mongodb://localhost:27017"
+	databaseName      = "gocache"
+	collectionName    = "instances"
+	connectionTimeout = 10 * time.Second
 )
 
 var currentInstanceID int64
 
-func RedisConnect() redis.Conn {
-	c, err := redis.Dial("tcp", "127.0.0.1:6379")
+func MongoConnect() (*mongo.Client, context.Context, context.CancelFunc) {
+	clientOptions := options.Client().ApplyURI(mongoURI)
+	ctx, cancel := context.WithTimeout(context.Background(), connectionTimeout)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 	HandleError(err)
 
-	return c
+	return client, ctx, cancel
 }
 
-func (a *AWS) init() {
-	c := RedisConnect()
-	defer c.Close()
+func (a *AWS) init() error {
+	client, ctx, cancel := MongoConnect()
+	defer client.Disconnect(ctx)
+	defer cancel()
 
 	svc := ec2.New(a.session)
 
 	input := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
-			&ec2.Filter{
+			{
 				Name: aws.String(""),
 				Values: []*string{
 					aws.String(""),
@@ -40,62 +52,64 @@ func (a *AWS) init() {
 		},
 	}
 	result, err := svc.DescribeInstances(input)
-
 	if err != nil {
-		fmt.Println("Error", err)
+		return fmt.Errorf("failed to describe instances: %w", err)
 	}
+
+	collection := client.Database(databaseName).Collection(collectionName)
 	for _, reservations := range result.Reservations {
 		for _, instance := range reservations.Instances {
 			fmt.Println("instance:", *instance)
-			output, err1 := json.Marshal(*instance)
-			if err1 != nil {
-				fmt.Println(err1)
+			ec2Instance := EC2Instance{
+				// Map fields from AWS SDK instance to EC2Instance struct
 			}
-			c.Do("SET", fmt.Sprintf("instance:%s", *instance.InstanceId), output, *instance)
+			_, err := collection.InsertOne(ctx, ec2Instance)
+			if err != nil {
+				log.Printf("Failed to insert instance: %v", err)
+			}
 		}
 	}
+	return nil
 }
 
 func FindAll() Instances {
 	var instances Instances
 
-	c := RedisConnect()
-	defer c.Close()
+	client, ctx, cancel := MongoConnect()
+	defer client.Disconnect(ctx)
+	defer cancel()
 
-	keys, err := c.Do("KEYS", "instance:*")
+	collection := client.Database(databaseName).Collection(collectionName)
+	cursor, err := collection.Find(ctx, bson.M{})
 	HandleError(err)
+	defer cursor.Close(ctx)
 
-	for _, k := range keys.([]interface{}) {
-		var instance Instance
-		reply, err := c.Do("GET", k.([]byte))
+	for cursor.Next(ctx) {
+		var instance EC2Instance
+		err := cursor.Decode(&instance)
 		HandleError(err)
-
-		if err := json.Unmarshal(reply.([]byte), &instance); err != nil {
-			panic(err)
-		}
 		instances = append(instances, instance)
 	}
 	return instances
 }
 
-func FindInstance(id int) Instance {
-	var instance Instance
+func FindInstance(id int) EC2Instance {
+	var instance EC2Instance
 
-	c := RedisConnect()
-	defer c.Close()
+	client, ctx, cancel := MongoConnect()
+	defer client.Disconnect(ctx)
+	defer cancel()
 
-	reply, err := c.Do("GET", "instance:"+strconv.Itoa(id))
+	collection := client.Database(databaseName).Collection(collectionName)
+	err := collection.FindOne(ctx, bson.M{"id": id}).Decode(&instance)
 	HandleError(err)
 
 	fmt.Println("GET OK")
 
-	if err = json.Unmarshal(reply.([]byte), &instance); err != nil {
-		panic(err)
-	}
 	return instance
 }
 
-func CreateInstance(p Instance) {
+func CreateInstance(p EC2Instance) {
 	currentime := time.Now()
 
 	currentInstanceID := currentime.Unix()
@@ -103,17 +117,19 @@ func CreateInstance(p Instance) {
 	p.ID = currentInstanceID
 	p.Timestamp = time.Now()
 
-	c := RedisConnect()
-	defer c.Close()
+	client, ctx, cancel := MongoConnect()
+	defer client.Disconnect(ctx)
+	defer cancel()
 
-	p.ID = currentInstanceID
-	p.Timestamp = time.Now()
-
-	b, err := json.Marshal(p)
+	collection := client.Database(databaseName).Collection(collectionName)
+	_, err := collection.InsertOne(ctx, p)
 	HandleError(err)
 
-	reply, err := c.Do("SET", "instance:"+strconv.Itoa(int(p.ID)), b)
-	HandleError(err)
+	fmt.Println("Instance created")
+}
 
-	fmt.Println("GET", reply)
+func HandleError(err error) {
+	if err != nil {
+		log.Printf("Error: %v", err)
+	}
 }
