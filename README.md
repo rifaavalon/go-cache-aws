@@ -12,7 +12,7 @@ Go (Golang)
 AWS CLI
 ## Setup
 1. Clone the Repository
-git clone https://github.com/yourusername/your-repo-name.git
+git clone https://github.com/yourusername/go-cache-aws.git
 `cd go-cache-aws`
 
 2. Set Up AWS Credentials
