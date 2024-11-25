@@ -32,10 +32,11 @@ To run the application locally without Docker, ensure you have Go installed and 
 `go run main.go`
 
 ## API Endpoints
+```
 GET /instances: Retrieve all instances.
 GET /instances/:id: Retrieve a specific instance by ID.
 POST /instances: Create a new instance.
-
+```
 
 ## Example Requests
 Get All Instances
