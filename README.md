@@ -39,6 +39,7 @@ POST /instances: Create a new instance.
 ```
 
 ## Example Requests
+
 Get All Instances
 `curl http://localhost:8080/instances`
 Get a Specific Instance
