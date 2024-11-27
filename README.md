@@ -2,18 +2,18 @@
 # AWS Cache Project
 This project is an AWS cache that allows you to pull data from the AWS API and store it in a MongoDB database. It was developed while working at Xero.
 
-## Features
+
 ## Features
 Fetches data from the AWS API.
 Stores the fetched data in a MongoDB database.
 Provides a RESTful API to interact with the cached data.
-### Prerequisites
+
 ### Prerequisites
 Docker
 Docker Compose
 Go (Golang)
 AWS CLI
-## Setup
+
 ## Setup
 1. Clone the Repository
 git clone https://github.com/yourusername/your-repo-name.git
