@@ -66,16 +66,16 @@ Create a New Instance
 └── README.md
 ```
 ## Configuration
-```
-## Configuration
-Environment Variables
+
+
+### Environment Variables
 
 MONGO_URI: The URI for connecting to MongoDB. Set this in your Docker Compose file or as an environment variable.
 
-## Contributing
-## Contributing
+
+### Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-## License
-## License
+### License
+### License
 This project is licensed under the MIT License. See the LICENSE file for details.
