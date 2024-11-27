@@ -16,25 +16,28 @@ AWS CLI
 
 ## Setup
 1. Clone the Repository
-git clone https://github.com/yourusername/your-repo-name.git
+git clone https://github.com/rifaavalon/go-cache-aws.git
+
 `cd go-cache-aws`
 
-2. Set Up AWS Credentials
+3. Set Up AWS Credentials
 Ensure your AWS credentials are configured locally. You can set them up using the AWS CLI:
 `aws configure`
 
 4. Build and Run the Docker Containers
 Use Docker Compose to build and run the Docker containers for your Go application and MongoDB:
+
 `docker-compose up --build`
-`docker-compose up --build`
+
 
 This will start your Go application on port 8080 and MongoDB on port 27017.
 
 ## Usage
 Running the Application
 To run the application locally without Docker, ensure you have Go installed and run:
+
 `go run main.go`
-`go run main.go`
+
 
 ## API Endpoints
 GET /instances: Retrieve all instances.
